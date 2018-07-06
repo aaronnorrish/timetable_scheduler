@@ -32,10 +32,10 @@ def gen_timetable(t, classes, pos, excel_file):
                 excel_file.append(timetable)
 
 if __name__ == '__main__':
-    if(len(argv)) == 5:
+    if(len(argv)) >= 5:
         files = []
         lectures = []
-        classes = []
+        all_classes = []
         lines = []
         for i in range(1,5):
             files.append(argv[i])
@@ -46,25 +46,74 @@ if __name__ == '__main__':
                 start = int(x[4][0:2])
                 end = int(x[4][-5:-3])
                 duration = end - start
-                if x[1] == "Lecture":
-                    lectures.append([argv[i], x[2][:-3], x[3], start, end, duration])
+                if x[1].find("Lecture") != -1:
+                    lectures.append([argv[i], x[2][:-3], x[3], start, end, duration]) # may add x[1] in to account for workshops
                 else:
                     lines.append([argv[i], x[1], x[2][:-3], x[3], start, end, duration])
             f.close()
 
+        flags = []
+        d_flag = -1
+        e_flag = -1
+        l_flag = -1
+        n_flag = -1
+        for i in range(5, len(argv)):
+            flag = argv[i]
+            invalid_flag = False
+            if flag[0] == "d":
+                d_flag = i - 5
+                flag_d = [flag.split("=")[0]]
+                flag = flag.split("=")[1].split(",")
+                for f in flag:
+                    if f == "mon" or f == "tue" or f == "wed" or f == "thu" or f == "fri":
+                        flag_d.append(f)
+                    else:
+                        print("Invalid flag")
+                        exit(0)
+                flags.append(flag_d)
+            elif flag[0] == "e" or flag[0] == "l" or flag[0] == "n":
+                if flag[0] == "e":
+                    e_flag = i - 5
+                elif flag[0] == "l":
+                    l_flag = i - 5
+                else:
+                    n_flag = i - 5
+                flags.append(flag.split("="))
+            else:
+                print("Invalid flag")
+                exit(0)
+
         for l in lines:
+            # print(l)
             unit = l[0]
             type = l[1]
             number = l[2]
 
             found = False
-            for c in classes:
+            for c in all_classes:
                 if c[0][0] == unit and c[0][1] == type and c[0][2] == number:
                     c.append(l)
                     found = True
                     break
             if not found:
-                classes.append([l])
+                all_classes.append([l])
+
+        classes = []
+        for i in range(len(all_classes)):
+            potential_classes = all_classes.pop()
+            c = []
+            for i in range(len(potential_classes)):
+                if d_flag != -1 and potential_classes[i][3][0:3].lower() in flags[d_flag]:
+                    continue
+                if e_flag != -1 and potential_classes[i][4] < int(flags[e_flag][1]):
+                    continue
+                if l_flag != -1 and potential_classes[i][5] > int(flags[l_flag][1]):
+                    continue
+                c.append(potential_classes[i])
+            if len(c) == 0:
+                print("Unable to generate any timetables with the given flags")
+                exit(0)
+            classes.append(c)
 
         # for l in lectures:
         #     print(l)
@@ -85,6 +134,7 @@ if __name__ == '__main__':
 
         excel_file = []
         gen_timetable(timetable, classes, 0, excel_file)
+        # print(len(excel_file))
 
         f = open("timetables.csv", "w")
         for temp in excel_file:
@@ -94,4 +144,4 @@ if __name__ == '__main__':
         f.close()
 
     else:
-        print("usage: timetableScheduler.py [arg1] [arg2] ... [arg4]")
+        print("usage: timetableScheduler.py [arg1] [arg2] ... [arg4] [flag1] ... [flagn]")
