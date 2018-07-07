@@ -6,7 +6,7 @@ This program may be run from the command line by using the following format:
   
  `python3 timetable_scheduler [file1] ... [file4] [flag1] ... [flagN]`
   
-  Where `[file1]` is a string referencing the name of a CSV file containing the classes of a unit. Each line in the CSV file will be of the format:
+  Where `[file1]` is the name of a CSV file containing the classes of a unit. Each line in the CSV file will be of the format:
   
  `[unit name] [activity] [other detail] [day] [time] [venue] [weeks]`
 
@@ -21,4 +21,4 @@ and `[flag1]` is one of the following flags, in the form `[<flag>=<value>]`
  
  n - exclude all timetables spanning greater than n days
  
- Note times given with the above flags must be in 24 hour time, and days must be given as the first three letters of the day in lowercase.
+ Note times given with the above flags must be in 24 hour time and days must be given as the first three letters of the day in lowercase.
