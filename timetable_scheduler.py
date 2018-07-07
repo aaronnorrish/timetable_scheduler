@@ -1,7 +1,7 @@
 from sys import argv
 from copy import deepcopy
 
-def gen_timetable(t, classes, pos, excel_file):
+def gen_timetable(t, classes, pos, excel_file, n):
     for i in range(len(classes[pos])):
         timetable = deepcopy(t)
         unit = classes[pos][i][0]
@@ -19,17 +19,27 @@ def gen_timetable(t, classes, pos, excel_file):
         time = (int(classes[pos][i][4]) - 8) * 2 + 1
         duration = int(classes[pos][i][6])
         clash = False
-        for n in range(duration):
-            if(timetable[time + n * 2][day] == ""):
-                timetable[time + n * 2][day] = unit
-                timetable[time + 1 + n * 2][day] = type
+        for x in range(duration):
+            if(timetable[time + x * 2][day] == ""):
+                timetable[time + x * 2][day] = unit
+                timetable[time + 1 + x * 2][day] = type
             else:
                 clash = True
         if not clash:
             if pos != len(classes) - 1:
-                gen_timetable(timetable, classes, pos + 1, excel_file)
+                gen_timetable(timetable, classes, pos + 1, excel_file, n)
             else:
-                excel_file.append(timetable)
+                if n == 5:
+                    excel_file.append(timetable)
+                else:
+                    empty = [True, True, True, True, True]
+                    for day in range(1, 6):
+                        for timeslot in range(1, len(timetable), 2):
+                            if(timetable[timeslot][day] != ""):
+                                empty[day - 1] = False
+                                break
+                    if empty.count(False) <= int(n):
+                        excel_file.append(timetable)
 
 if __name__ == '__main__':
     if(len(argv)) >= 5:
@@ -46,7 +56,7 @@ if __name__ == '__main__':
                 start = int(x[4][0:2])
                 end = int(x[4][-5:-3])
                 duration = end - start
-                if x[1].find("Lecture") != -1:
+                if x[1].find("Lecture") != -1 or x[1].find("Workshop") != -1:
                     lectures.append([argv[i], x[2][:-3], x[3], start, end, duration]) # may add x[1] in to account for workshops
                 else:
                     lines.append([argv[i], x[1], x[2][:-3], x[3], start, end, duration])
@@ -83,8 +93,9 @@ if __name__ == '__main__':
                 print("Invalid flag")
                 exit(0)
 
+
         for l in lines:
-            # print(l)
+            print(l)
             unit = l[0]
             type = l[1]
             number = l[2]
@@ -133,8 +144,18 @@ if __name__ == '__main__':
         timetable = deepcopy(template)
 
         excel_file = []
-        gen_timetable(timetable, classes, 0, excel_file)
-        # print(len(excel_file))
+        if n_flag == -1:
+            gen_timetable(timetable, classes, 0, excel_file, 5)
+        else:
+            gen_timetable(timetable, classes, 0, excel_file, flags[n_flag][1])
+        if(len(excel_file) == 0):
+            print("Unable to generate any timetables with the given value of the n flag")
+            exit(0)
+        if(len(excel_file) == 1):
+            print(str(len(excel_file)) + " potential timetable generated.")
+        else:
+            print(str(len(excel_file)) + " potential timetables generated.")
+
 
         f = open("timetables.csv", "w")
         for temp in excel_file:
@@ -144,4 +165,4 @@ if __name__ == '__main__':
         f.close()
 
     else:
-        print("usage: timetableScheduler.py [arg1] [arg2] ... [arg4] [flag1] ... [flagn]")
+        print("usage: timetable_scheduler.py [arg1] [arg2] ... [arg4] [flag1] ... [flagn]")
