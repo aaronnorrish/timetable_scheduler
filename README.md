@@ -9,9 +9,8 @@ This program may be run from the command line by using the following format:
   Where `[file1]` is a string referencing the name of a CSV file containing the classes of a unit. Each line in the CSV file will be of the format:
   
  `[unit name] [activity] [other detail] [day] [time] [venue] [weeks]`
-and `[flag1]` is one of the following flags, formatted as such:
-   
-   `[<flag>=<value>]`
+
+and `[flag1]` is one of the following flags, in the form `[<flag>=<value>]`
    
  ### Flags
  d - exclude all classes taking place on day d - may take multiple values, e.g `d=mon,thu`
