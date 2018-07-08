@@ -1,7 +1,7 @@
 from sys import argv
 from copy import deepcopy
 
-def gen_timetable(t, classes, pos, excel_file, n):
+def gen_timetable(t, classes, pos, excel_file, display_lectures, n):
     for i in range(len(classes[pos])):
         timetable = deepcopy(t)
         unit = classes[pos][i][0]
@@ -27,22 +27,50 @@ def gen_timetable(t, classes, pos, excel_file, n):
                 clash = True
         if not clash:
             if pos != len(classes) - 1:
-                gen_timetable(timetable, classes, pos + 1, excel_file, n)
+                gen_timetable(timetable, classes, pos + 1, excel_file, display_lectures, n)
             else:
+                valid_timetable = False
                 if n == 5:
-                    excel_file.append(timetable)
+                    valid_timetable = True
+                    # excel_file.append(timetable)
                 else:
-                    empty = [True, True, True, True, True]
-                    for day in range(1, 6):
-                        for timeslot in range(1, len(timetable), 2):
-                            if(timetable[timeslot][day] != ""):
-                                empty[day - 1] = False
-                                break
-                    if empty.count(False) <= int(n):
-                        excel_file.append(timetable)
+                    if n!= 5:
+                        empty = [True, True, True, True, True]
+                        for day in range(1, 6):
+                            for timeslot in range(1, len(timetable), 2):
+                                if(timetable[timeslot][day] != ""):
+                                    empty[day - 1] = False
+                                    break
+                        if empty.count(False) <= int(n):
+                            valid_timetable = True
+                if valid_timetable:
+                    if display_lectures:
+                        for lecture in lectures:
+                            unit = lecture[0]
+                            type = lecture[1]
+                            if lecture[2] == "Monday":
+                                day = 1
+                            elif lecture[2] == "Tuesday":
+                                day = 2
+                            elif lecture[2] == "Wednesday":
+                                day = 3
+                            elif lecture[2] == "Thursday":
+                                day = 4
+                            elif lecture[2] == "Friday":
+                                day = 5
+                            time = (int(lecture[3]) - 8) * 2 + 1
+                            duration = int(lecture[5])
+                            for x in range(duration):
+                                if(timetable[time + x * 2][day] == ""):
+                                    timetable[time + x * 2][day] = unit
+                                    timetable[time + 1 + x * 2][day] = type
+                                else:
+                                    timetable[time + x * 2][day] = timetable[time + x * 2][day] + "/" + unit
+                                    timetable[time + 1 + x * 2][day] = timetable[time + 1 + x * 2][day] + "/" + type
+                    excel_file.append(timetable)
 
 if __name__ == '__main__':
-    if(len(argv)) >= 5:
+    if(len(argv)) >= 6:
         files = []
         lectures = []
         all_classes = []
@@ -62,16 +90,20 @@ if __name__ == '__main__':
                     lines.append([argv[i], x[1], x[2][:-3], x[3], start, end, duration])
             f.close()
 
+        display_lectures = True if argv[5]=="lec=y" else False
         flags = []
         d_flag = -1
         e_flag = -1
-        l_flag = -1
+        a_flag = -1
         n_flag = -1
-        for i in range(5, len(argv)):
+        g_flag = -1
+        l_flag = -1
+
+        for i in range(6, len(argv)):
             flag = argv[i]
             invalid_flag = False
             if flag[0] == "d":
-                d_flag = i - 5
+                d_flag = i - 6
                 flag_d = [flag.split("=")[0]]
                 flag = flag.split("=")[1].split(",")
                 for f in flag:
@@ -81,13 +113,14 @@ if __name__ == '__main__':
                         print("Invalid flag")
                         exit(0)
                 flags.append(flag_d)
-            elif flag[0] == "e" or flag[0] == "l" or flag[0] == "n":
+            elif flag[0] == "e" or flag[0] == "a" or flag[0] == "n":
                 if flag[0] == "e":
-                    e_flag = i - 5
-                elif flag[0] == "l":
-                    l_flag = i - 5
+                    e_flag = i - 6
+                elif flag[0] == "a":
+                    a_flag = i - 6
                 else:
-                    n_flag = i - 5
+                    n_flag = i - 6
+
                 flags.append(flag.split("="))
             else:
                 print("Invalid flag")
@@ -95,7 +128,7 @@ if __name__ == '__main__':
 
 
         for l in lines:
-            print(l)
+            # print(l)
             unit = l[0]
             type = l[1]
             number = l[2]
@@ -118,7 +151,7 @@ if __name__ == '__main__':
                     continue
                 if e_flag != -1 and potential_classes[i][4] < int(flags[e_flag][1]):
                     continue
-                if l_flag != -1 and potential_classes[i][5] > int(flags[l_flag][1]):
+                if a_flag != -1 and potential_classes[i][5] > int(flags[a_flag][1]):
                     continue
                 c.append(potential_classes[i])
             if len(c) == 0:
@@ -144,13 +177,13 @@ if __name__ == '__main__':
         timetable = deepcopy(template)
 
         excel_file = []
-        if n_flag == -1:
-            gen_timetable(timetable, classes, 0, excel_file, 5)
-        else:
-            gen_timetable(timetable, classes, 0, excel_file, flags[n_flag][1])
+
+        n = 5 if n_flag == -1 else flags[n_flag][1]
+        gen_timetable(timetable, classes, 0, excel_file, display_lectures, n)
         if(len(excel_file) == 0):
             print("Unable to generate any timetables with the given value of the n flag")
             exit(0)
+
         if(len(excel_file) == 1):
             print(str(len(excel_file)) + " potential timetable generated.")
         else:
