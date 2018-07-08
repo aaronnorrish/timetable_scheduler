@@ -198,4 +198,4 @@ if __name__ == '__main__':
         f.close()
 
     else:
-        print("usage: timetable_scheduler.py [arg1] [arg2] ... [arg4] [flag1] ... [flagn]")
+        print("usage: timetable_scheduler.py [arg1] [arg2] ... [arg4] [lecflag] [flag1] ... [flagn]")
