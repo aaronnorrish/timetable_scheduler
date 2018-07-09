@@ -32,7 +32,6 @@ def gen_timetable(t, classes, pos, excel_file, display_lectures, n):
                 valid_timetable = False
                 if n == 5:
                     valid_timetable = True
-                    # excel_file.append(timetable)
                 else:
                     if n!= 5:
                         empty = [True, True, True, True, True]
@@ -69,12 +68,15 @@ def gen_timetable(t, classes, pos, excel_file, display_lectures, n):
                                     timetable[time + 1 + x * 2][day] = timetable[time + 1 + x * 2][day] + "/" + type
                     excel_file.append(timetable)
 
+
+
 if __name__ == '__main__':
     if(len(argv)) >= 6:
         files = []
         lectures = []
         all_classes = []
         lines = []
+        include_lectures = True if argv[5]=="lec=y" else False
         for i in range(1,5):
             files.append(argv[i])
             f = open(files[i - 1] + ".csv", "r")
@@ -84,13 +86,13 @@ if __name__ == '__main__':
                 start = int(x[4][0:2])
                 end = int(x[4][-5:-3])
                 duration = end - start
-                if x[1].find("Lecture") != -1 or x[1].find("Workshop") != -1:
+                if not include_lectures and (x[1].find("Lecture") != -1 or x[1].find("Workshop") != -1):
                     lectures.append([argv[i], x[2][:-3], x[3], start, end, duration]) # may add x[1] in to account for workshops
                 else:
                     lines.append([argv[i], x[1], x[2][:-3], x[3], start, end, duration])
             f.close()
 
-        display_lectures = True if argv[5]=="lec=y" else False
+        display_lectures = True if argv[5]=="lec=d" else False
         flags = []
         d_flag = -1
         e_flag = -1
@@ -181,7 +183,7 @@ if __name__ == '__main__':
         n = 5 if n_flag == -1 else flags[n_flag][1]
         gen_timetable(timetable, classes, 0, excel_file, display_lectures, n)
         if(len(excel_file) == 0):
-            print("Unable to generate any timetables with the given value of the n flag")
+            print("Unable to generate any timetables with the given flags")
             exit(0)
 
         if(len(excel_file) == 1):
@@ -198,4 +200,4 @@ if __name__ == '__main__':
         f.close()
 
     else:
-        print("usage: timetable_scheduler.py [arg1] [arg2] ... [arg4] [lecflag] [flag1] ... [flagn]")
+        print("usage: timetable_scheduler.py [arg1] [arg2] ... [arg4] [lecflag] [flag1] ... [flagN]")
