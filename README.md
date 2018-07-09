@@ -21,7 +21,7 @@ This program may be run from the command line by using the following format:
  
  e - exclude all classes before the earliest time e
  
- l - exclude all classes after the latest time l 
+ a - exclude all classes after the latest time a 
  
  n - exclude all timetables spanning greater than n days
  
