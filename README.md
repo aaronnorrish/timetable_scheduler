@@ -6,7 +6,7 @@ This program may be run from the command line by using the following format:
   
  `python3 timetable_scheduler [file1] ... [file4] [lecflag] [flag1] ... [flagN]`
   
-  Where `[file1]` is the name of a CSV file containing the classes of a unit, `[lecflag]` denotes whether lectures should be displayed in the timetable (`lec=y`) or not (`lec=n`), and `[flag1]` is one of the below flags, in the form `<flag>=<value>` 
+  Where `[file1]` is the name of a CSV file containing the classes of a unit, `[lecflag]` denotes whether lectures: should not  clash with other classes (`lec=y`), should be able to clash and display them in the timetable (`lec=d`) or should be able to clash and don't display them (`lec=n`), and `[flag1]` is one of the below flags, in the form `<flag>=<value>` 
   
   Note each line in the CSV file must be of the format:
   
