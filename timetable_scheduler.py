@@ -1,7 +1,26 @@
 from sys import argv
 from copy import deepcopy
 
-def gen_timetable(t, classes, pos, excel_file, display_lectures, n):
+def determine_used_days(timetable):
+    empty = [True, True, True, True, True]
+    for day in range(1, 6):
+        for timeslot in range(1, len(timetable), 2):
+            if(timetable[timeslot][day] != ""):
+                empty[day - 1] = False
+                break
+    return empty.count(False)
+
+def det_l_flag(timetable, l):
+    for day in range(1, 6):
+        duration = 0
+        for timeslot in range(1, len(timetable), 2):
+            if(timetable[timeslot][day] != ""):
+                duration += 1
+        if 0 < duration < l:
+            return False
+    return True
+
+def gen_timetable(t, classes, pos, excel_file, display_lectures, n, l):
     for i in range(len(classes[pos])):
         timetable = deepcopy(t)
         unit = classes[pos][i][0]
@@ -27,21 +46,14 @@ def gen_timetable(t, classes, pos, excel_file, display_lectures, n):
                 clash = True
         if not clash:
             if pos != len(classes) - 1:
-                gen_timetable(timetable, classes, pos + 1, excel_file, display_lectures, n)
+                gen_timetable(timetable, classes, pos + 1, excel_file, display_lectures, n, l)
             else:
-                valid_timetable = False
-                if n == 5:
-                    valid_timetable = True
-                else:
-                    if n!= 5:
-                        empty = [True, True, True, True, True]
-                        for day in range(1, 6):
-                            for timeslot in range(1, len(timetable), 2):
-                                if(timetable[timeslot][day] != ""):
-                                    empty[day - 1] = False
-                                    break
-                        if empty.count(False) <= int(n):
-                            valid_timetable = True
+                valid_timetable = True
+                if n != 5 or l > 0: # n or l flags used
+                    if n != 5: # n flag used, might change function to return bool for consistency
+                        valid_timetable = True if determine_used_days(timetable) <= int(n) else False
+                    if valid_timetable and l > 0: # l flag used
+                        valid_timetable = det_l_flag(timetable, l)
                 if valid_timetable:
                     if display_lectures:
                         for lecture in lectures:
@@ -87,7 +99,7 @@ if __name__ == '__main__':
                 end = int(x[4][-5:-3])
                 duration = end - start
                 if not include_lectures and (x[1].find("Lecture") != -1 or x[1].find("Workshop") != -1):
-                    lectures.append([argv[i], x[2][:-3], x[3], start, end, duration]) # may add x[1] in to account for workshops
+                    lectures.append([argv[i], x[2][:-3], x[3], start, end, duration])
                 else:
                     lines.append([argv[i], x[1], x[2][:-3], x[3], start, end, duration])
             f.close()
@@ -115,13 +127,15 @@ if __name__ == '__main__':
                         print("Invalid flag")
                         exit(0)
                 flags.append(flag_d)
-            elif flag[0] == "e" or flag[0] == "a" or flag[0] == "n":
+            elif flag[0] == "e" or flag[0] == "a" or flag[0] == "n" or flag[0] == "l":
                 if flag[0] == "e":
                     e_flag = i - 6
                 elif flag[0] == "a":
                     a_flag = i - 6
-                else:
+                elif flag[0] == "n":
                     n_flag = i - 6
+                else:
+                    l_flag = i - 6
 
                 flags.append(flag.split("="))
             else:
@@ -181,7 +195,9 @@ if __name__ == '__main__':
         excel_file = []
 
         n = 5 if n_flag == -1 else flags[n_flag][1]
-        gen_timetable(timetable, classes, 0, excel_file, display_lectures, n)
+        l = -1 if l_flag == -1 else int(flags[l_flag][1]) # take into account l = 0
+
+        gen_timetable(timetable, classes, 0, excel_file, display_lectures, n, l)
         if(len(excel_file) == 0):
             print("Unable to generate any timetables with the given flags")
             exit(0)
