@@ -10,6 +10,26 @@ def determine_used_days(timetable):
                 break
     return empty.count(False)
 
+def det_g_flag(timetable, g):
+    for day in range(1, 6):
+        class_started = False
+        gap = False
+        gap_duration = 0
+        for timeslot in range(1, len(timetable), 2):
+            if timetable[timeslot][day] != "" and not class_started:
+                if gap:
+                    if gap_duration > g:
+                        return False
+                    gap = False
+                class_started = True
+            elif timetable[timeslot][day] == "": # nothing scheduled
+                if class_started:
+                    gap = True
+                    class_started = False
+                if gap:
+                    gap_duration += 1
+    return True
+
 def det_l_flag(timetable, l):
     for day in range(1, 6):
         duration = 0
@@ -20,7 +40,7 @@ def det_l_flag(timetable, l):
             return False
     return True
 
-def gen_timetable(t, classes, pos, excel_file, display_lectures, n, l):
+def gen_timetable(t, classes, pos, excel_file, display_lectures, n, g, l):
     for i in range(len(classes[pos])):
         timetable = deepcopy(t)
         unit = classes[pos][i][0]
@@ -46,12 +66,14 @@ def gen_timetable(t, classes, pos, excel_file, display_lectures, n, l):
                 clash = True
         if not clash:
             if pos != len(classes) - 1:
-                gen_timetable(timetable, classes, pos + 1, excel_file, display_lectures, n, l)
+                gen_timetable(timetable, classes, pos + 1, excel_file, display_lectures, n, g, l)
             else:
                 valid_timetable = True
-                if n != 5 or l > 0: # n or l flags used
+                if n != 5 or g >= 0 or l > 0: # n, g or l flags used
                     if n != 5: # n flag used, might change function to return bool for consistency
                         valid_timetable = True if determine_used_days(timetable) <= int(n) else False
+                    if valid_timetable and g >= 0: # g flag used
+                        valid_timetable = det_g_flag(timetable, g)
                     if valid_timetable and l > 0: # l flag used
                         valid_timetable = det_l_flag(timetable, l)
                 if valid_timetable:
@@ -127,13 +149,15 @@ if __name__ == '__main__':
                         print("Invalid flag")
                         exit(0)
                 flags.append(flag_d)
-            elif flag[0] == "e" or flag[0] == "a" or flag[0] == "n" or flag[0] == "l":
+            elif flag[0] == "e" or flag[0] == "a" or flag[0] == "n" or flag[0]=="g" or flag[0] == "l":
                 if flag[0] == "e":
                     e_flag = i - 6
                 elif flag[0] == "a":
                     a_flag = i - 6
                 elif flag[0] == "n":
                     n_flag = i - 6
+                elif flag[0] == "g":
+                    g_flag = i - 6
                 else:
                     l_flag = i - 6
 
@@ -195,9 +219,12 @@ if __name__ == '__main__':
         excel_file = []
 
         n = 5 if n_flag == -1 else flags[n_flag][1]
+        g = -1 if g_flag == -1 else int(flags[g_flag][1])
         l = -1 if l_flag == -1 else int(flags[l_flag][1]) # take into account l = 0
 
-        gen_timetable(timetable, classes, 0, excel_file, display_lectures, n, l)
+        print(n, g, l)
+
+        gen_timetable(timetable, classes, 0, excel_file, display_lectures, n, g, l)
         if(len(excel_file) == 0):
             print("Unable to generate any timetables with the given flags")
             exit(0)
