@@ -25,6 +25,9 @@ This program may be run from the command line by using the following format:
  
  n - exclude all timetables spanning greater than n days
  
+ g - exclude all timetables with gaps greater than g hours between classes
+ 
  l - exclude all timetables with days with less than l hours of classes (only applies to days that have at least one class, i.e a timetable containing a day with no classes will not be excluded)
+
  
  Note times given with the above flags must be in 24 hour time and days must be given as the first three letters of the day in lowercase.
