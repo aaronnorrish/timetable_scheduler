@@ -3,7 +3,7 @@ from copy import deepcopy
 
 # Determines whether the timetable has classes on less than or equal to n days.
 #   @param timetable a matrix representing a potential timetable
-#   @param n an integer representing the maximum amount of days that classes may be on
+#   @param n an integer representing the maximum amount of days that classes may take place on
 #   @return True if the timetable has classes on less than or equal to n days, False otherwise
 def determine_used_days(timetable, n):
     empty = [True, True, True, True, True]
@@ -68,7 +68,21 @@ def get_day_num(day_string):
         day = 5
     return day
 
-
+# Recursive function used to generate all possible permutations of a time table.
+#  If a class is found to clash or not meet a condition of the n, g or l flags
+#  execution is terminated for that particular recursive branch.
+#   @param t the current timetable table being generated from the previous step
+#           in the recursive branch
+#   @param classes a list containing all classes for all units (those that have met
+#            the conditions of the d, e and a flags)
+#   @param pos the current position in the classes list from which we must extract
+#             a class from for the current instance of the timetable
+#   @param excel_file a list containing all valid timetables
+#   @param display_lectures a boolean denoting whether lectures should be displayed
+#             in the timetable (True) or not (False)
+#   @param n an integer representing the maximum amount of days that classes may take place on
+#   @param g an integer representing the maximum number of hours allowed between classes
+#   @param l an integer representing the minimum number of hours that classes may take up per day
 def gen_timetable(t, classes, pos, excel_file, display_lectures, n, g, l):
     for i in range(len(classes[pos])):
         timetable = deepcopy(t)
