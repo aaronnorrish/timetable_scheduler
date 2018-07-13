@@ -18,7 +18,7 @@ def determine_used_days(timetable, n):
 #   @param timetable a matrix representing a potential timetable
 #   @param g an integer representing the maximum number of hours allowed between classes
 #   @return True if the timetable has gaps less than or equal to g hours, False otherwise
-def det_g_flag(timetable, g): # need better testing
+def det_g_flag(timetable, g):
     for day in range(1, 6):
         class_started = False
         gap = False
@@ -220,6 +220,31 @@ if __name__ == '__main__':
                 exit(0)
             classes.append(c)
 
+        # calculate the number of hours of each activity per week
+        durations = []
+        for l in lectures:
+            class_type = l[1][:-3]
+            duration = l[5]
+            found = False
+            for d in durations:
+                if d[0] == class_type:
+                    d[1] += duration
+                    found = True
+                    break
+            if not found:
+                durations.append([class_type, duration])
+        for c in classes:
+            class_type = c[0][1]
+            duration = c[0][6]
+            found = False
+            for d in durations:
+                if d[0] == class_type:
+                    d[1] += duration
+                    found = True
+                    break
+            if not found:
+                durations.append([class_type, duration])
+
         # for l in lectures:
         #     print(l)
 
@@ -253,6 +278,13 @@ if __name__ == '__main__':
             print(str(len(excel_file)) + " potential timetable generated.")
         else:
             print(str(len(excel_file)) + " potential timetables generated.")
+
+        # add activity durations to excel_file list
+        excel_file[0][0].append("")
+        excel_file[0][1].append("")
+        for i in range(len(durations)):
+            excel_file[0][0].append(durations[i][0])
+            excel_file[0][1].append(str(durations[i][1]))
 
         # write the timetables to the excel file
         f = open("timetables.csv", "w")
