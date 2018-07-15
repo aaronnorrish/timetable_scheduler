@@ -31,3 +31,6 @@ This program may be run from the command line by using the following format:
 
  
  Note times given with the above flags must be in 24 hour time and days must be given as the first three letters of the day in lowercase.
+ 
+ ## Output
+The number of timetables generated will be output to the command line or, if none were able to be generated, it will print "unable to generate any timetables with the given flags".
