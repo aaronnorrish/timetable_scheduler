@@ -31,3 +31,5 @@ This program may be run from the command line by using the following format:
 The number of timetables generated will be output to the command line or, if none were able to be generated, it will print "unable to generate any timetables with the given flags".
 
 Each generated timetable is stored in "timetables.csv" and spans Monday to Friday, with times ranging from 8am to 6pm. Each timeslot is an hour long and represented as two cells - if a class falls on a timeslot, the first cell contains the unit to which the class belongs, and the second, the type of class it is (e.g Lecture). Timetables are separated by an empty row.
+
+The number of hours per each type of class per week are also displayed in the csv file, on the first two lines to the right of the first timetable. 
