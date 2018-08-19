@@ -7,8 +7,14 @@ This program may be run from the command line by using the following format:
  ```
  python3 timetable_scheduler.py [file1] ... [file4] [lecflag] [flag1] ... [flagN]
  ```
-
-  Where `[file1]` is the name of a CSV file containing the classes of a unit, `[lecflag]` denotes whether lectures should: not  clash with other classes (`lec=y`), be able to clash and display them in the timetable (`lec=d`) or be able to clash and don't display them (`lec=n`), and `[flag1]` is one of the below flags, in the form `<flag>=<value>`
+ 
+  Where:
+   * `[file1]` is the name of a CSV file containing the classes of a unit, 
+   * `[lecflag]` denotes whether lectures should:
+     * not clash with other classes (`lec=y`), or
+     * be able to clash and display them in the timetable (`lec=d`), or
+     * be able to clash and don't display them (`lec=n`) 
+   * `[flag1]` is one of the below flags, in the form `<flag>=<value>`
 
   Note each line in the CSV file must be of the format:
 
@@ -17,7 +23,7 @@ This program may be run from the command line by using the following format:
  ```
 
  ### Flags
- d - exclude all classes taking place on day d - may take multiple values, e.g `d=mon,thu`
+ d - exclude all classes taking place on day d (may take multiple values, e.g `d=mon,thu`)
 
  e - exclude all classes before the earliest time e
 
